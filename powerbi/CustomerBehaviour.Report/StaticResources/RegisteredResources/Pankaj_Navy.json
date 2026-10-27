@@ -1,0 +1,91 @@
+{
+  "name": "Pankaj Navy",
+  "dataColors": [
+    "#1F3864",
+    "#E07B39",
+    "#3FA7A3",
+    "#2F75B5",
+    "#B0413E",
+    "#7A5C9E",
+    "#C9A227",
+    "#8C96A8",
+    "#5DA5DA",
+    "#60BD68"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#252423",
+  "tableAccent": "#1F3864",
+  "good": "#3FA7A3",
+  "neutral": "#C9A227",
+  "bad": "#B0413E",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 11,
+      "color": "#1F3864"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 9,
+      "color": "#3B3B3B"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 22,
+      "color": "#1F3864"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#DDE2EA"
+              }
+            },
+            "radius": 6
+          }
+        ],
+        "title": [
+          {
+            "show": true,
+            "fontColor": {
+              "solid": {
+                "color": "#1F3864"
+              }
+            },
+            "fontSize": 11
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#F2F4F8"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    }
+  }
+}

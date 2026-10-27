@@ -1,0 +1,95 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "164290a2888d27942b8e",
+  "position": {
+    "x": 16,
+    "y": 450,
+    "z": 9000,
+    "height": 258,
+    "width": 1248,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Calendar"
+                    }
+                  },
+                  "Property": "Month"
+                }
+              },
+              "queryRef": "Calendar.Month",
+              "nativeQueryRef": "Month",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Retail"
+                    }
+                  },
+                  "Property": "CY Sales per Customer"
+                }
+              },
+              "queryRef": "Retail.CY Sales per Customer",
+              "nativeQueryRef": "CY Sales per Customer",
+              "displayName": "Sales per customer"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Retail"
+                    }
+                  },
+                  "Property": "Avg Sales per Customer (year)"
+                }
+              },
+              "queryRef": "Retail.Avg Sales per Customer (year)",
+              "nativeQueryRef": "Avg Sales per Customer (year)",
+              "displayName": "Year average"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Sales per customer by month, with the year average'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

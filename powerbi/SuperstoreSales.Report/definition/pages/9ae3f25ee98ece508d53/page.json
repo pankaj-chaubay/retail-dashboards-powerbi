@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/1.4.0/schema.json",
+  "name": "9ae3f25ee98ece508d53",
+  "displayName": "Product, segment and discount",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280
+}

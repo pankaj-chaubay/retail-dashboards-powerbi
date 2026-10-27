@@ -1,0 +1,4 @@
+relationship b7d09d8332d2aa15c9b2
+	fromColumn: Superstore.'Order Date'
+	toColumn: Calendar.Date
+

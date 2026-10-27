@@ -1,0 +1,145 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "1806e30e15b56df18328",
+  "position": {
+    "x": 786,
+    "y": 450,
+    "z": 12000,
+    "height": 258,
+    "width": 478,
+    "tabOrder": 12000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "How to read this page",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#1F3864",
+                      "fontWeight": "bold"
+                    }
+                  }
+                ],
+                "horizontalTextAlignment": "left"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Pick a year at the top right. Every number compares that year with the year before.",
+                    "textStyle": {
+                      "fontSize": "9.5pt",
+                      "color": "#333333"
+                    }
+                  }
+                ],
+                "horizontalTextAlignment": "left"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "2024: 4,964 customers (+3.2% on 2023) and sales of $5.21M (+1.1%).",
+                    "textStyle": {
+                      "fontSize": "9.5pt",
+                      "color": "#333333"
+                    }
+                  }
+                ],
+                "horizontalTextAlignment": "left"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Segments are close in size, so growth is not coming from one group.",
+                    "textStyle": {
+                      "fontSize": "9.5pt",
+                      "color": "#333333"
+                    }
+                  }
+                ],
+                "horizontalTextAlignment": "left"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "About half of all orders are returned. Returns are the main lever for profit.",
+                    "textStyle": {
+                      "fontSize": "9.5pt",
+                      "color": "#333333"
+                    }
+                  }
+                ],
+                "horizontalTextAlignment": "left"
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Click a segment or a region to filter the whole page.",
+                    "textStyle": {
+                      "fontSize": "9.5pt",
+                      "color": "#333333"
+                    }
+                  }
+                ],
+                "horizontalTextAlignment": "left"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

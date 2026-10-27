@@ -1,0 +1,263 @@
+table Superstore
+
+	/// Year chosen in the year slicer. Replaces the Tableau parameter 'Select Year'.
+	measure 'Selected Year' = SELECTEDVALUE ( 'Select Year'[Year], 2017 )
+		formatString: 0
+
+	/// Sales in the selected year
+	measure 'CY Sales' = ```
+			VAR y = [Selected Year]
+			RETURN CALCULATE ( SUM ( Superstore[Sales] ), 'Calendar'[Year] = y )
+			```
+		formatString: $#,0
+
+	/// Sales in the year before the selected year
+	measure 'PY Sales' = ```
+			VAR y = [Selected Year] - 1
+			RETURN CALCULATE ( SUM ( Superstore[Sales] ), 'Calendar'[Year] = y )
+			```
+		formatString: $#,0
+
+	/// Change in sales against the previous year
+	measure 'Sales vs PY %' = DIVIDE ( [CY Sales] - [PY Sales], [PY Sales] )
+		formatString: +0.0%;-0.0%;0.0%
+
+	/// Profit in the selected year
+	measure 'CY Profit' = ```
+			VAR y = [Selected Year]
+			RETURN CALCULATE ( SUM ( Superstore[Profit] ), 'Calendar'[Year] = y )
+			```
+		formatString: $#,0
+
+	/// Profit in the year before the selected year
+	measure 'PY Profit' = ```
+			VAR y = [Selected Year] - 1
+			RETURN CALCULATE ( SUM ( Superstore[Profit] ), 'Calendar'[Year] = y )
+			```
+		formatString: $#,0
+
+	/// Change in profit against the previous year
+	measure 'Profit vs PY %' = DIVIDE ( [CY Profit] - [PY Profit], [PY Profit] )
+		formatString: +0.0%;-0.0%;0.0%
+
+	/// Customers in the selected year
+	measure 'CY Customers' = ```
+			VAR y = [Selected Year]
+			RETURN CALCULATE ( DISTINCTCOUNT ( Superstore[Customer ID] ), 'Calendar'[Year] = y )
+			```
+		formatString: #,0
+
+	/// Customers in the year before the selected year
+	measure 'PY Customers' = ```
+			VAR y = [Selected Year] - 1
+			RETURN CALCULATE ( DISTINCTCOUNT ( Superstore[Customer ID] ), 'Calendar'[Year] = y )
+			```
+		formatString: #,0
+
+	/// Change in customers against the previous year
+	measure 'Customers vs PY %' = DIVIDE ( [CY Customers] - [PY Customers], [PY Customers] )
+		formatString: +0.0%;-0.0%;0.0%
+
+	/// Profit / sales, selected year
+	measure 'CY Profit Margin' = DIVIDE ( [CY Profit], [CY Sales] )
+		formatString: 0.0%
+
+	measure 'CY Sales per Customer' = DIVIDE ( [CY Sales], [CY Customers] )
+		formatString: $#,0
+
+	measure 'CY Profit per Customer' = DIVIDE ( [CY Profit], [CY Customers] )
+		formatString: $#,0
+
+	measure 'CY Avg Discount' = ```
+			VAR y = [Selected Year]
+			RETURN CALCULATE ( AVERAGE ( Superstore[Discount] ), 'Calendar'[Year] = y )
+			```
+		formatString: 0.0%
+
+	/// Running share of sales, largest sub-category first (Pareto line)
+	measure 'Cumulative Sales %' = ```
+			VAR cur = [CY Sales]
+			VAR subcats = ALLSELECTED ( Superstore[Sub-Category] )
+			VAR total = CALCULATE ( [CY Sales], subcats )
+			VAR running = SUMX ( FILTER ( subcats, [CY Sales] >= cur ), [CY Sales] )
+			RETURN IF ( NOT ISBLANK ( cur ), DIVIDE ( running, total ) )
+			```
+		formatString: 0%
+
+	measure 'State Sales Rank' = ```
+			IF (
+			    ISINSCOPE ( Superstore[State] ) && NOT ISBLANK ( [CY Sales] ),
+			    RANKX ( ALLSELECTED ( Superstore[State] ), [CY Sales], , DESC, DENSE )
+			)
+			```
+		formatString: 0
+
+	measure 'Top 10 State Sales' = IF ( NOT ISBLANK ( [State Sales Rank] ) && [State Sales Rank] <= 10, [CY Sales] )
+		formatString: $#,0
+
+	measure 'Top 10 State Sales PY' = IF ( NOT ISBLANK ( [State Sales Rank] ) && [State Sales Rank] <= 10, [PY Sales] )
+		formatString: $#,0
+
+	measure 'Top 10 State Margin' = IF ( NOT ISBLANK ( [State Sales Rank] ) && [State Sales Rank] <= 10, [CY Profit Margin] )
+		formatString: 0.0%
+
+	/// Rank by profit margin among customers with at least $1,000 sales in the year
+	measure 'Customer Margin Rank' = ```
+			IF (
+			    ISINSCOPE ( Superstore[Customer Name] ) && [CY Sales] >= 1000,
+			    RANKX (
+			        FILTER ( ALLSELECTED ( Superstore[Customer Name] ), [CY Sales] >= 1000 ),
+			        [CY Profit Margin], , DESC, DENSE
+			    )
+			)
+			```
+		formatString: 0
+
+	measure 'Top 5 Customer Sales' = IF ( NOT ISBLANK ( [Customer Margin Rank] ) && [Customer Margin Rank] <= 5, [CY Sales] )
+		formatString: $#,0
+
+	measure 'Top 5 Customer Profit' = IF ( NOT ISBLANK ( [Customer Margin Rank] ) && [Customer Margin Rank] <= 5, [CY Profit] )
+		formatString: $#,0
+
+	measure 'Top 5 Customer Margin' = IF ( NOT ISBLANK ( [Customer Margin Rank] ) && [Customer Margin Rank] <= 5, [CY Profit Margin] )
+		formatString: 0.0%
+
+	column 'Row ID'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: Row ID
+
+	column 'Order ID'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Order ID
+
+	column 'Order Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		summarizeBy: none
+		sourceColumn: Order Date
+
+	column 'Ship Date'
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		summarizeBy: none
+		sourceColumn: Ship Date
+
+	column 'Ship Mode'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Ship Mode
+
+	column 'Customer ID'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+	column 'Customer Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Customer Name
+
+	column Segment
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Segment
+
+	column Country
+		dataType: string
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+	column City
+		dataType: string
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+	column State
+		dataType: string
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+	column 'Postal Code'
+		dataType: string
+		dataCategory: PostalCode
+		summarizeBy: none
+		sourceColumn: Postal Code
+
+	column Region
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Region
+
+	column 'Product ID'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product ID
+
+	column Category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Category
+
+	column 'Sub-Category'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Sub-Category
+
+	column 'Product Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product Name
+
+	column Sales
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Sales
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+	column Discount
+		dataType: double
+		formatString: 0%
+		summarizeBy: none
+		sourceColumn: Discount
+
+	column Profit
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Profit
+
+	column 'State Location' = Superstore[State] & ", United States"
+		dataType: string
+		dataCategory: Place
+		summarizeBy: none
+
+	partition Superstore = m
+		mode: import
+		source = ```
+				let
+				    Source = Csv.Document(
+				        Web.Contents(DataSourceUrl, [RelativePath = "superstore_sales.csv"]),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(
+				        Headers,
+				        {{"Row ID", Int64.Type}, {"Order ID", type text}, {"Order Date", type date}, {"Ship Date", type date}, {"Ship Mode", type text}, {"Customer ID", type text}, {"Customer Name", type text}, {"Segment", type text}, {"Country", type text}, {"City", type text}, {"State", type text}, {"Postal Code", type text}, {"Region", type text}, {"Product ID", type text}, {"Category", type text}, {"Sub-Category", type text}, {"Product Name", type text}, {"Sales", type number}, {"Quantity", Int64.Type}, {"Discount", type number}, {"Profit", type number}},
+				        "en-US"
+				    )
+				in
+				    Typed
+				```
+

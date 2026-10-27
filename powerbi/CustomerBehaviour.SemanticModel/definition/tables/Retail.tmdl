@@ -1,0 +1,201 @@
+table Retail
+
+	/// Year chosen in the year slicer. Replaces the Tableau parameter 'Select year'.
+	measure 'Selected Year' = SELECTEDVALUE ( 'Select Year'[Year], 2024 )
+		formatString: 0
+
+	/// Sales in the selected year
+	measure 'CY Sales' = ```
+			VAR y = [Selected Year]
+			RETURN CALCULATE ( SUM ( Retail[Sales] ), 'Calendar'[Year] = y )
+			```
+		formatString: $#,0
+
+	/// Sales in the year before the selected year
+	measure 'PY Sales' = ```
+			VAR y = [Selected Year] - 1
+			RETURN CALCULATE ( SUM ( Retail[Sales] ), 'Calendar'[Year] = y )
+			```
+		formatString: $#,0
+
+	/// Change in sales against the previous year
+	measure 'Sales vs PY %' = DIVIDE ( [CY Sales] - [PY Sales], [PY Sales] )
+		formatString: +0.0%;-0.0%;0.0%
+
+	/// Profit in the selected year
+	measure 'CY Profit' = ```
+			VAR y = [Selected Year]
+			RETURN CALCULATE ( SUM ( Retail[Profit] ), 'Calendar'[Year] = y )
+			```
+		formatString: $#,0
+
+	/// Profit in the year before the selected year
+	measure 'PY Profit' = ```
+			VAR y = [Selected Year] - 1
+			RETURN CALCULATE ( SUM ( Retail[Profit] ), 'Calendar'[Year] = y )
+			```
+		formatString: $#,0
+
+	/// Change in profit against the previous year
+	measure 'Profit vs PY %' = DIVIDE ( [CY Profit] - [PY Profit], [PY Profit] )
+		formatString: +0.0%;-0.0%;0.0%
+
+	/// Customers in the selected year
+	measure 'CY Customers' = ```
+			VAR y = [Selected Year]
+			RETURN CALCULATE ( DISTINCTCOUNT ( Retail[Customer_ID] ), 'Calendar'[Year] = y )
+			```
+		formatString: #,0
+
+	/// Customers in the year before the selected year
+	measure 'PY Customers' = ```
+			VAR y = [Selected Year] - 1
+			RETURN CALCULATE ( DISTINCTCOUNT ( Retail[Customer_ID] ), 'Calendar'[Year] = y )
+			```
+		formatString: #,0
+
+	/// Change in customers against the previous year
+	measure 'Customers vs PY %' = DIVIDE ( [CY Customers] - [PY Customers], [PY Customers] )
+		formatString: +0.0%;-0.0%;0.0%
+
+	/// Sales per customer, selected year
+	measure 'CY Sales per Customer' = DIVIDE ( [CY Sales], [CY Customers] )
+		formatString: $#,0
+
+	/// Sales per customer, previous year
+	measure 'PY Sales per Customer' = DIVIDE ( [PY Sales], [PY Customers] )
+		formatString: $#,0
+
+	measure 'Sales per Customer vs PY %' = DIVIDE ( [CY Sales per Customer] - [PY Sales per Customer], [PY Sales per Customer] )
+		formatString: +0.0%;-0.0%;0.0%
+
+	/// Average of the monthly values, drawn as a reference line
+	measure 'Avg Sales per Customer (year)' = AVERAGEX ( ALLSELECTED ( 'Calendar'[Month No], 'Calendar'[Month] ), [CY Sales per Customer] )
+		formatString: $#,0
+
+	measure 'CY Quantity' = ```
+			VAR y = [Selected Year]
+			RETURN CALCULATE ( SUM ( Retail[Quantity] ), 'Calendar'[Year] = y )
+			```
+		formatString: #,0
+
+	/// Average discount rate in the selected year
+	measure 'CY Avg Discount' = ```
+			VAR y = [Selected Year]
+			RETURN CALCULATE ( AVERAGE ( Retail[Discount] ), 'Calendar'[Year] = y )
+			```
+		formatString: 0.0%
+
+	/// Share of orders returned in the selected year
+	measure 'CY Return Rate' = ```
+			VAR y = [Selected Year]
+			RETURN
+			    DIVIDE (
+			        CALCULATE ( COUNTROWS ( Retail ), Retail[Return_Status] = "Returned", 'Calendar'[Year] = y ),
+			        CALCULATE ( COUNTROWS ( Retail ), 'Calendar'[Year] = y )
+			    )
+			```
+		formatString: 0.0%
+
+	/// Rank of a customer by sales in the selected year
+	measure 'Customer Sales Rank' = ```
+			IF (
+			    ISINSCOPE ( Retail[Customer_Name] ) && NOT ISBLANK ( [CY Sales] ),
+			    RANKX ( ALLSELECTED ( Retail[Customer_Name] ), [CY Sales], , DESC, DENSE )
+			)
+			```
+		formatString: 0
+
+	measure 'Top 10 Sales' = IF ( [Customer Sales Rank] <= 10 && NOT ISBLANK ( [Customer Sales Rank] ), [CY Sales] )
+		formatString: $#,0
+
+	measure 'Top 10 Profit' = IF ( [Customer Sales Rank] <= 10 && NOT ISBLANK ( [Customer Sales Rank] ), [CY Profit] )
+		formatString: $#,0
+
+	measure 'Top 10 Quantity' = IF ( [Customer Sales Rank] <= 10 && NOT ISBLANK ( [Customer Sales Rank] ), [CY Quantity] )
+		formatString: #,0
+
+	column Customer_ID
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Customer_ID
+
+	column Customer_Name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Customer_Name
+
+	column Product_Category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product_Category
+
+	column Region
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Region
+
+	column Customer_Segment
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Customer_Segment
+
+	column Purchase_Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		summarizeBy: none
+		sourceColumn: Purchase_Date
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+	column Unit_Price
+		dataType: double
+		formatString: #,0.00
+		summarizeBy: sum
+		sourceColumn: Unit_Price
+
+	column Discount
+		dataType: double
+		formatString: 0%
+		summarizeBy: sum
+		sourceColumn: Discount
+
+	column Sales
+		dataType: double
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: Sales
+
+	column Profit
+		dataType: double
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: Profit
+
+	column Return_Status
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Return_Status
+
+	partition Retail = m
+		mode: import
+		source = ```
+				let
+				    Source = Csv.Document(
+				        Web.Contents(DataSourceUrl, [RelativePath = "retail_customer_behavior.csv"]),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(
+				        Headers,
+				        {{"Customer_ID", type text}, {"Customer_Name", type text}, {"Product_Category", type text}, {"Region", type text}, {"Customer_Segment", type text}, {"Purchase_Date", type date}, {"Quantity", Int64.Type}, {"Unit_Price", type number}, {"Discount", type number}, {"Sales", type number}, {"Profit", type number}, {"Return_Status", type text}},
+				        "en-US"
+				    )
+				in
+				    Typed
+				```
+

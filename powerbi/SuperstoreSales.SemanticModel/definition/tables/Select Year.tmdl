@@ -1,0 +1,12 @@
+table 'Select Year'
+
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: [Year]
+
+	partition 'Select Year' = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 2014, 2017, 1 ), "Year", [Value] )
+

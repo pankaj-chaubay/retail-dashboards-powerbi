@@ -1,0 +1,4 @@
+relationship 7e4872ab388863fa6409
+	fromColumn: Retail.Purchase_Date
+	toColumn: Calendar.Date
+
